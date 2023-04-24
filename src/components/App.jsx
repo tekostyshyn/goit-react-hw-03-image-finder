@@ -17,7 +17,7 @@ export class App extends Component {
   };
 
   async componentDidUpdate(prevProps, prevState) {
-    const { pageNumber, searchQuery } = this.state;
+    const { pageNumber, searchQuery, pictures } = this.state;
     if (
       prevState.searchQuery !== searchQuery ||
       prevState.pageNumber !== pageNumber
@@ -25,15 +25,7 @@ export class App extends Component {
       this.setState({ isLoading: true });
       try {
         const newPictures = await API.searchPictures(searchQuery, pageNumber);
-        let allPictures;
-        if (
-          prevState.searchQuery !== searchQuery &&
-          prevState.pageNumber !== pageNumber
-        ) {
-          allPictures = [...newPictures];
-        } else {
-          allPictures = [...prevState.pictures, ...newPictures];
-        }
+        const allPictures = [...pictures, ...newPictures];
         this.setState({ pictures: allPictures });
       } catch (error) {
         this.setState({ error });
@@ -57,7 +49,7 @@ export class App extends Component {
     });
   };
 
-  getImageUrl = url => {
+  openModal = url => {
     this.setState({
       largeImgUrl: url,
       showModal: true,
@@ -66,6 +58,7 @@ export class App extends Component {
 
   closeModal = () => {
     this.setState({
+      largeImgUrl: '',
       showModal: false,
     });
   };
@@ -75,7 +68,7 @@ export class App extends Component {
     return (
       <>
         <Seachbar onSubmit={this.getSearchQuery} />
-        <ImageGallery pics={pictures} onClick={this.getImageUrl} />
+        <ImageGallery pics={pictures} onClick={this.openModal} />
         {pictures.length > 0 && <Button onClick={this.changePageNumber} />}
         {showModal && <Modal onClose={this.closeModal} url={largeImgUrl} />}
       </>
