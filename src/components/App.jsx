@@ -3,6 +3,7 @@ import Seachbar from './Searchbar';
 import ImageGallery from './ImageGallery';
 import Button from './Button';
 import Modal from './Modal';
+import Loader from './Loader';
 import * as API from 'services/api';
 
 export class App extends Component {
@@ -35,7 +36,7 @@ export class App extends Component {
     }
   }
 
-  getSearchQuery = value => {
+  searchPics = value => {
     this.setState({
       searchQuery: value,
       pageNumber: 1,
@@ -64,12 +65,15 @@ export class App extends Component {
   };
 
   render() {
-    const { pictures, largeImgUrl, showModal } = this.state;
+    const { pictures, largeImgUrl, showModal, isLoading } = this.state;
     return (
       <>
-        <Seachbar onSubmit={this.getSearchQuery} />
-        <ImageGallery pics={pictures} onClick={this.openModal} />
-        {pictures.length > 0 && <Button onClick={this.changePageNumber} />}
+        <Seachbar onSubmit={this.searchPics} />
+        {pictures.length > 0 && (
+          <ImageGallery pics={pictures} onClick={this.openModal} />
+        )}
+        {isLoading && <Loader />}
+        {pictures.length > 0 && isLoading === false && <Button onClick={this.changePageNumber} />}
         {showModal && <Modal onClose={this.closeModal} url={largeImgUrl} />}
       </>
     );
