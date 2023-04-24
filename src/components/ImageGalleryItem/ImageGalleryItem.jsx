@@ -1,6 +1,6 @@
-const ImageGalleryItem = ({url}) => {
+const ImageGalleryItem = ({url, onClick}) => {
   return (
-    <li className="ImageGalleryItem">
+    <li className="ImageGalleryItem" onClick={() => {onClick(url)}}>
       <img className="ImageGalleryItem-image" src={url} alt="" />
     </li>
   );

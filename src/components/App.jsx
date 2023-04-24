@@ -2,6 +2,7 @@ import { Component } from 'react';
 import Seachbar from './Searchbar';
 import ImageGallery from './ImageGallery';
 import Button from './Button';
+import Modal from './Modal';
 import * as API from 'services/api';
 
 export class App extends Component {
@@ -11,6 +12,8 @@ export class App extends Component {
     pictures: [],
     isLoading: false,
     error: null,
+    largeImgUrl: '',
+    showModal: false,
   };
 
   async componentDidUpdate(prevProps, prevState) {
@@ -54,14 +57,28 @@ export class App extends Component {
     });
   };
 
+  getImageUrl = url => {
+    this.setState({
+      largeImgUrl: url,
+      showModal: true,
+    });
+  };
+
+  closeModal = () => {
+    this.setState({
+      showModal: false,
+    });
+  };
+
   render() {
-    const { pictures } = this.state;
+    const { pictures, largeImgUrl, showModal } = this.state;
     return (
-      <div>
+      <>
         <Seachbar onSubmit={this.getSearchQuery} />
-        <ImageGallery pics={pictures} />
+        <ImageGallery pics={pictures} onClick={this.getImageUrl} />
         {pictures.length > 0 && <Button onClick={this.changePageNumber} />}
-      </div>
+        {showModal && <Modal onClose={this.closeModal} url={largeImgUrl} />}
+      </>
     );
   }
 }
