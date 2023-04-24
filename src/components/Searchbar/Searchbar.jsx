@@ -13,14 +13,7 @@ class Seachbar extends Component {
 
   handleSubmit = e => {
     e.preventDefault();
-    this.resetInput();
     this.props.onSubmit(this.state.inputValue)
-  };
-
-  resetInput = () => {
-    this.setState({
-      inputValue: '',
-    });
   };
 
   render() {

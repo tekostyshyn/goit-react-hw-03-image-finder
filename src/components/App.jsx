@@ -2,45 +2,41 @@ import { Component } from 'react';
 import Seachbar from './Searchbar';
 import ImageGallery from './ImageGallery';
 import Button from './Button';
-import axios from 'axios';
-
-const KEY = '8210264-2ea871c1a05460bb4aaa242b8';
-axios.defaults.baseURL = 'https://pixabay.com/api';
+import * as API from 'services/api';
 
 export class App extends Component {
   state = {
     searchQuery: '',
     pageNumber: 1,
     pictures: [],
+    isLoading: false,
+    error: null,
   };
 
   async componentDidUpdate(prevProps, prevState) {
     const { pageNumber, searchQuery } = this.state;
-
     if (
       prevState.searchQuery !== searchQuery ||
       prevState.pageNumber !== pageNumber
     ) {
-      const response = await axios.get(
-        `?q=${searchQuery}&page=${pageNumber}&key=${KEY}&image_type=photo&orientation=horizontal&per_page=12`
-      );
-      const newPictures = response.data.hits.map(
-        ({ id, webformatURL, largeImageURL }) => {
-          return { id, webformatURL, largeImageURL };
+      this.setState({ isLoading: true });
+      try {
+        const newPictures = await API.searchPictures(searchQuery, pageNumber);
+        let allPictures;
+        if (
+          prevState.searchQuery !== searchQuery &&
+          prevState.pageNumber !== pageNumber
+        ) {
+          allPictures = [...newPictures];
+        } else {
+          allPictures = [...prevState.pictures, ...newPictures];
         }
-      );
-
-      if (
-        prevState.searchQuery !== searchQuery &&
-        prevState.pageNumber !== pageNumber
-      ) {
-        const searchedPictures = [...newPictures];
-        this.setState({ pictures: searchedPictures });
-        return;
+        this.setState({ pictures: allPictures });
+      } catch (error) {
+        this.setState({ error });
+      } finally {
+        this.setState({ isLoading: false });
       }
-
-      const searchedPictures = [...prevState.pictures, ...newPictures];
-      this.setState({ pictures: searchedPictures });
     }
   }
 
@@ -59,7 +55,7 @@ export class App extends Component {
   };
 
   render() {
-    const {pictures} = this.state;
+    const { pictures } = this.state;
     return (
       <div>
         <Seachbar onSubmit={this.getSearchQuery} />
