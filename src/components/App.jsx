@@ -15,32 +15,47 @@ export class App extends Component {
     error: null,
     largeImgUrl: '',
     showModal: false,
+    showButton: false,
   };
 
   async componentDidUpdate(prevProps, prevState) {
-    const { pageNumber, searchQuery, pictures } = this.state;
+    const { pageNumber, searchQuery } = this.state;
     if (
       prevState.searchQuery !== searchQuery ||
       prevState.pageNumber !== pageNumber
     ) {
-      this.setState({ isLoading: true });
+      this.setState({ isLoading: true, showButton: false });
       try {
         const newPictures = await API.searchPictures(searchQuery, pageNumber);
-        const allPictures = [...pictures, ...newPictures];
+        // якщо просто розпилити сюди prevState.pictures, то при пошуку за новим ключовим словом
+        // старий масив не зникає з галереї, воно додає картинки поверх масиву з попереднього пошуку.
+        // я закоментую старий варіант і зроблю нижче новий, єдиний який знаю, іншого варіанту з prevState.pictures я не бачу
+        // const allPictures = [...pictures, ...newPictures];
+        // this.setState({ pictures: allPictures });
+        let allPictures;
+        if (
+          prevState.searchQuery !== searchQuery &&
+          prevState.pageNumber !== pageNumber
+        ) {
+          allPictures = [...newPictures];
+        } else {
+          allPictures = [...prevState.pictures, ...newPictures];
+        }
         this.setState({ pictures: allPictures });
+        //
       } catch (error) {
         this.setState({ error });
       } finally {
-        this.setState({ isLoading: false });
+        this.setState({ isLoading: false, showButton: true });
       }
     }
   }
 
   searchPics = value => {
     this.setState({
+      pictures: [],
       searchQuery: value,
       pageNumber: 1,
-      pictures: [],
     });
   };
 
@@ -65,7 +80,7 @@ export class App extends Component {
   };
 
   render() {
-    const { pictures, largeImgUrl, showModal, isLoading } = this.state;
+    const { pictures, largeImgUrl, showModal, isLoading, showButton } = this.state;
     return (
       <>
         <Seachbar onSubmit={this.searchPics} />
@@ -73,7 +88,9 @@ export class App extends Component {
           <ImageGallery pics={pictures} onClick={this.openModal} />
         )}
         {isLoading && <Loader />}
-        {pictures.length > 0 && isLoading === false && <Button onClick={this.changePageNumber} />}
+        {pictures.length > 0 && showButton === true && (
+          <Button onClick={this.changePageNumber} />
+        )}
         {showModal && <Modal onClose={this.closeModal} url={largeImgUrl} />}
       </>
     );
