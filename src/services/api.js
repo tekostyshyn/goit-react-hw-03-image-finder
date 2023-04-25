@@ -8,7 +8,5 @@ export const searchPictures = async (searchQuery, pageNumber) => {
     `?q=${searchQuery}&page=${pageNumber}&key=${KEY}&image_type=photo&orientation=horizontal&per_page=12`
   );
 
-  return response.data.hits.map(({ id, webformatURL, largeImageURL }) => {
-    return { id, webformatURL, largeImageURL };
-  });
+  return response.data
 };

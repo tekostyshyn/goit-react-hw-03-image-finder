@@ -20,24 +20,28 @@ export class App extends Component {
 
   async componentDidUpdate(prevProps, prevState) {
     const { pageNumber, searchQuery, pictures } = this.state;
-    let responseLength;
     if (
       prevState.searchQuery !== searchQuery ||
       prevState.pageNumber !== pageNumber
     ) {
       this.setState({ isLoading: true, showButton: false });
       try {
-        const newPictures = await API.searchPictures(searchQuery, pageNumber);
-        responseLength = Math.floor(newPictures.length / 12);
+        const fetchedPictures = await API.searchPictures(searchQuery,pageNumber);
+        const picturesAmount = fetchedPictures.totalHits;
+        const newPictures = fetchedPictures.hits.map(
+          ({ id, webformatURL, largeImageURL }) => {
+            return { id, webformatURL, largeImageURL };
+          }
+        );
         const allPictures = [...pictures, ...newPictures];
-        this.setState({ pictures: allPictures });
-        // якщо просто розпилити сюди prevState.pictures, то при пошуку за новим ключовим словом
-        // старий масив не зникає з галереї, воно додає картинки поверх масиву з попереднього пошуку.
-        // на жаль я не можу придумати як це виправити, можливо ви можете допомогти
+        this.setState({
+          pictures: allPictures,
+          showButton: pageNumber < Math.ceil(picturesAmount / 12),
+        });
       } catch (error) {
         this.setState({ error });
       } finally {
-        this.setState({ isLoading: false, showButton: responseLength < 1 ? false : true });
+        this.setState({ isLoading: false });
       }
     }
   }
@@ -71,7 +75,8 @@ export class App extends Component {
   };
 
   render() {
-    const { pictures, largeImgUrl, showModal, isLoading, showButton } = this.state;
+    const { pictures, largeImgUrl, showModal, isLoading, showButton } =
+      this.state;
     return (
       <>
         <Seachbar onSubmit={this.searchPics} />
