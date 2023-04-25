@@ -33,11 +33,13 @@ export class App extends Component {
             return { id, webformatURL, largeImageURL };
           }
         );
-        const allPictures = [...pictures, ...newPictures];
-        this.setState({
-          pictures: allPictures,
-          showButton: pageNumber < Math.ceil(picturesAmount / 12),
-        });
+        this.setState((prevState) => {
+          return {
+            pictures: [...prevState.pictures, ...newPictures],
+            showButton: pageNumber < Math.ceil(picturesAmount / 12),
+          }
+        } 
+    );
       } catch (error) {
         this.setState({ error });
       } finally {
