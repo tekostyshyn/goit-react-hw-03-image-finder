@@ -9,7 +9,7 @@ class ImageGallery extends Component {
 
     if (prevProps.pics.length !== this.props.pics.length) {
       window.scrollBy({
-        bottom: cardHeight * 4,
+        top: cardHeight * 4,
         behavior: 'smooth',
       });
     }
