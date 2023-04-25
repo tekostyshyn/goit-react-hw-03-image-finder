@@ -19,7 +19,7 @@ export class App extends Component {
   };
 
   async componentDidUpdate(prevProps, prevState) {
-    const { pageNumber, searchQuery, pictures } = this.state;
+    const { pageNumber, searchQuery } = this.state;
     if (
       prevState.searchQuery !== searchQuery ||
       prevState.pageNumber !== pageNumber
@@ -77,13 +77,13 @@ export class App extends Component {
   };
 
   render() {
-    const { pictures, largeImgUrl, showModal, isLoading, showButton } =
+    const {pageNumber, pictures, largeImgUrl, showModal, isLoading, showButton } =
       this.state;
     return (
       <>
         <Seachbar onSubmit={this.searchPics} />
         {pictures.length > 0 && (
-          <ImageGallery pics={pictures} onClick={this.openModal} />
+          <ImageGallery pics={pictures} onClick={this.openModal} pageNumber={pageNumber}/>
         )}
         {isLoading && <Loader />}
         {pictures.length > 0 && showButton === true && (

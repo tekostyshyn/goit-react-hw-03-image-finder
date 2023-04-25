@@ -2,15 +2,17 @@ import ImageGalleryItem from 'components/ImageGalleryItem';
 import { Component } from 'react';
 
 class ImageGallery extends Component {
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
     const { height: cardHeight } = document
-      .querySelector('.ImageGallery')
-      .firstElementChild.getBoundingClientRect();
+    .querySelector('.ImageGallery')
+    .firstElementChild.getBoundingClientRect();
 
-    window.scrollBy({
-      top: cardHeight * 4,
-      behavior: 'smooth',
-    });
+    if (prevProps.pics.length !== this.props.pics.length) {
+      window.scrollBy({
+        bottom: cardHeight * 4,
+        behavior: 'smooth',
+      });
+    }
   }
 
   render() {
